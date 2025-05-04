@@ -13,7 +13,7 @@ local M = {}
 
 ---@type Sessionizer
 local _options = {
-    paths = {},
+    paths = { wezterm.home_dir },
     git_repos = true,
     binding = {
         key = "o",
@@ -43,7 +43,7 @@ local function exec(cmd)
     if success then
         return output
     else
-        print(string.format("The command failed (%s, code %d)\n", exit_type, code))
+        return string.format("The command failed (%s, code %d)\n", exit_type, code)
     end
 end
 
@@ -146,6 +146,8 @@ M.apply_to_config = function(config, options)
             table.insert(_options.paths, expand_path(p))
         end
     end
+
+    _options.git_repos = options.git_repos or _options.git_repos
 
     -- M.change_workspace(config)
     return M.list_dirs()
