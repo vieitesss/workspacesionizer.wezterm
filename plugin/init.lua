@@ -48,7 +48,7 @@ local function exec(cmd)
 end
 
 M.list_dirs = function()
-    return exec([[ ls -l ]])
+    return exec([[ find -L ]] .. table.concat(_options.paths, ' ') .. [[ -type d -mindepth 1 -maxdepth 1 ]])
 end
 
 M.find_git_repos = function()
