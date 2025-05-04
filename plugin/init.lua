@@ -48,36 +48,15 @@ local function exec(cmd)
 end
 
 _options.list_paths_dirs = function()
-    return exec([[ find -L ]] .. table.concat(_options.paths, ' ') .. [[ -type d -mindepth 1 -maxdepth 1 ]])
+    return exec([[find -L ]] .. table.concat(_options.paths, ' ') .. [[ -type d -mindepth 1 -maxdepth 1 ]])
 end
 
-M.find_git_repos = function()
-    -- local home = os.getenv("HOME")
-    -- local repos = {}
-    --
-    -- local function scan(dir, depth)
-    --     if depth >= 2 then return end
-    --     for name in lfs.dir(dir) do
-    --         if name ~= "." and name ~= ".." and name ~= ".Trash" and name ~= "Library" then
-    --             local full = dir .. "/" .. name
-    --             local mode = lfs.symlinkattributes(full, "mode")
-    --             if mode == "directory" then
-    --                 if name == ".git" then
-    --                     table.insert(repos, dir)
-    --                 else
-    --                     scan(full, depth + 1)
-    --                 end
-    --             end
-    --         end
-    --     end
-    -- end
-    --
-    -- scan(home, 0)
-    -- return repos
+local function find_git_repos()
+    return exec([[fd -H -d 2 -E "Library" -t d "^\.git$" "$HOME" | sed "s#/\.git/##g"]])
 end
 
 ---@return table
-M.get_all_dirs = function()
+_options.get_all_dirs = function()
     all_dirs = {}
 
     for _, value in ipairs(_options.paths) do
@@ -150,8 +129,13 @@ M.apply_to_config = function(config, options)
 
     _options.git_repos = options.git_repos or _options.git_repos
 
-    -- M.change_workspace(config)
-    return _options.list_paths_dirs()
+    local out = {}
+    if _options.git_repos then
+        table.insert(out, find_git_repos())
+    end
+
+    table.insert(out, _options.list_paths_dirs())
+    return table.concat(out, '\n')
 end
 
 
