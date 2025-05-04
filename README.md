@@ -4,9 +4,6 @@ Like [tmux-sessionizer](https://github.com/ThePrimeagen/.dotfiles/blob/602019e90
 
 ![demo](/assets/demo.gif)
 
-> [!DANGER]
-> Custom binding not supported yet, give me a minute.
-
 > [!IMPORTANT]
 > Sorry for the name. :)
 
