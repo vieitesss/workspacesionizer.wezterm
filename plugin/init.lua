@@ -47,7 +47,7 @@ local function exec(cmd)
     end
 end
 
-M.list_dirs = function()
+_options.list_paths_dirs = function()
     return exec([[ find -L ]] .. table.concat(_options.paths, ' ') .. [[ -type d -mindepth 1 -maxdepth 1 ]])
 end
 
@@ -142,6 +142,7 @@ end
 ---@return string output
 M.apply_to_config = function(config, options)
     if options.paths or options.paths ~= nil then
+        _options.paths = {}
         for _, p in ipairs(options.paths) do
             table.insert(_options.paths, expand_path(p))
         end
@@ -150,7 +151,7 @@ M.apply_to_config = function(config, options)
     _options.git_repos = options.git_repos or _options.git_repos
 
     -- M.change_workspace(config)
-    return M.list_dirs()
+    return _options.list_paths_dirs()
 end
 
 
