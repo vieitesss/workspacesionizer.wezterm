@@ -3,10 +3,13 @@ dir := shell('fd -t d "^files.*workspace.*" ~/Library/Application\ Support/wezte
 _default:
   just -l
 
-run:
+up:
   rm -rf {{dir}} || true
+  git commit -a -m "$(date)"
+
+run:
   wezterm
 
-try:
-  @echo "rm -rf {{dir}}"
-  @echo "wezterm"
+res:
+  git reset --soft HEAD~1
+  git restore --staged .
