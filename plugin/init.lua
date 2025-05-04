@@ -33,8 +33,22 @@ local function expand_path(path)
     return path
 end
 
+---@param cmd string The command to execute.
+---@return string The output
+local function exec(cmd)
+    local handle = io.popen(cmd)
+    local output = handle:read("*a")
+    local success, exit_type, code = handle:close()
+
+    if success then
+        return output
+    else
+        print(string.format("The command failed (%s, code %d)\n", exit_type, code))
+    end
+end
+
 M.list_dirs = function()
-    return wezterm.run_child_process({ 'fd', '.', '~/personal' })
+    return exec([[ ls -l ]])
 end
 
 M.find_git_repos = function()
