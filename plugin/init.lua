@@ -48,7 +48,8 @@ local function exec(cmd)
 end
 
 M.list_dirs = function()
-    return exec([[ find -L ]] .. table.concat(_options.paths, ' ') .. [[ -type d -mindepth 1 -maxdepth 1 ]])
+    -- return exec([[ find -L ]] .. table.concat(_options.paths, ' ') .. [[ -type d -mindepth 1 -maxdepth 1 ]])
+    return table.concat(_options.paths, ' ')
 end
 
 M.find_git_repos = function()
@@ -139,14 +140,15 @@ end
 
 ---@param config table
 ---@param options Sessionizer
+---@return string output
 M.apply_to_config = function(config, options)
     if options.paths or options.paths ~= nil then
         _options.paths = options.paths
     end
 
-    M.change_workspace(config)
+    -- M.change_workspace(config)
+    return M.list_dirs()
 end
 
-M.list_dirs()
 
 return M
