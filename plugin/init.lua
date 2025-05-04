@@ -67,63 +67,48 @@ _options.get_all_dirs = function()
     return table.concat(all)
 end
 
-_options.select_workspace = function()
-    local dirs = _options.get_all_dirs()
-    local selected = exec([[echo "]] .. dirs ..
-        [[" | fzf --layout=reverse --preview-window down --preview "eza --color=always -l {}"]])
-    return selected
-end
-
-function trim(s)
+---@param s string The string to trim.
+---@return string The string trimed.
+local function trim(s)
     return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
 
----@param config table
----@return string
-_options.change_workspace = function(config)
-    local selected = _options.select_workspace()
-    if not selected or selected == "" then
-        return ""
-    end
-
-    selected = trim(selected)
-    local basename = selected:match("([^/]+)$")
-    local workspace = basename:gsub("%.", "_")
-
-    return workspace
-end
-
+---@return string The absolute path to de plugin.
 local function get_plugin_dir()
     for _, p in ipairs(wezterm.plugin.list()) do
         if p.url:match("workspacesionizer") then
-            return p.plugin_dir
+            return p.plugin_dir:gsub("/+$", "")
         end
     end
     return wezterm.home_dir
 end
 
-local function split_lines(str)
+---@param s string The string to split into lines.
+---@return table A table with all the lines from the string.
+local function split_lines(s)
     local t = {}
-    for line in str:gmatch("([^\r\n]+)") do
+    for line in s:gmatch("([^\r\n]+)") do
         table.insert(t, line)
     end
     return t
 end
 
+---@return table A table with entries of SpawnCommand.
 local function build_entries()
     local entries = {}
     local all = split_lines(_options.get_all_dirs())
     local plugin_dir = get_plugin_dir()
-    local script = plugin_dir .. "plugin/workspace.sh"
+    local script = plugin_dir .. "/plugin/workspace.sh"
     for _, dir in ipairs(all) do
         local full = expand_path(dir)
-        local name = full:match("([^/]+)$")
+        local basename = full:match("([^/]+)$")
+        local workspace = basename:gsub("%.", "_")
         table.insert(entries, {
-            label = name,
+            label = basename,
             args = { script },
             cwd = full,
             domain = "CurrentPaneDomain",
-            set_environment_variables = { WEZTERM_WORKSPACE = name },
+            set_environment_variables = { WEZTERM_WORKSPACE = workspace },
         })
     end
     return entries
@@ -151,11 +136,10 @@ M.apply_to_config = function(config, options)
         },
     })
 
-    wezterm.on("user-var-changed", function(window, pane, name, base64_val)
-        if name == "workspace" and base64_val and base64_val ~= "" then
-            local decoded = wezterm.decode_base64(base64_val)
+    wezterm.on("user-var-changed", function(window, pane, name, value)
+        if name == "workspace" and value and value ~= "" then
             window:perform_action(
-                act.SwitchToWorkspace { name = decoded },
+                wezterm.action.SwitchToWorkspace { name = value },
                 pane
             )
         end
