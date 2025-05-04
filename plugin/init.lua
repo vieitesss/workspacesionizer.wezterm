@@ -135,7 +135,7 @@ M.apply_to_config = function(config, options)
     end
 
     table.insert(out, _options.list_paths_dirs())
-    return table.concat(out, '\n')
+    return table.concat(out, '')
 end
 
 
