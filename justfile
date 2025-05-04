@@ -4,12 +4,9 @@ _default:
   just -l
 
 up:
-  rm -rf {{dir}} || true
   git commit -a -m "$(date)"
+  git push prueba main
+  rm -rf {{dir}} || true
 
 run:
   wezterm
-
-res:
-  git reset --soft HEAD~1
-  git restore --staged .
