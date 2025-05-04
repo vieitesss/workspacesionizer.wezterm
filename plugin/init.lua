@@ -34,7 +34,7 @@ local function expand_path(path)
 end
 
 M.list_dirs = function()
-    return "hola"
+    return wezterm.run_child_process({ 'fd', '.', '~/personal' })
 end
 
 M.find_git_repos = function()
