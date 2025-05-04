@@ -126,6 +126,12 @@ M.apply_to_config = function(config, options)
 
     _options.git_repos = options.git_repos ~= false
 
+    if options.binding then
+        if options.binding.key and options.binding.mods then
+            _options.binding = options.binding
+        end
+    end
+
     config.launch_menu = build_entries()
 
     table.insert(config.keys, {
