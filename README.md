@@ -49,7 +49,7 @@ wpr.apply_to_config(config, {
 ## Default values
 
 ```lua
-local _options = {
+{
     paths = { wezterm.home_dir },
     git_repos = true,
     binding = {
