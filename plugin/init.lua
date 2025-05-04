@@ -127,7 +127,9 @@ M.apply_to_config = function(config, options)
         end
     end
 
-    _options.git_repos = (not (options.git_repos == false)) or _options.git_repos
+    if options.git_repos == false then
+        _options.git_repos = false
+    end
 
     local out = {}
     if _options.git_repos then
