@@ -4,8 +4,10 @@ _default:
   just -l
 
 r:
-  rm -rf "{{dir}}" || true
   git commit -a -m "$(date)"
+  rm -rf "{{dir}}" || true
   wezterm
+
+res:
   git reset --soft HEAD~1
   git restore --staged .

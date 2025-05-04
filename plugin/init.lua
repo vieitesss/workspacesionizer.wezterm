@@ -55,39 +55,21 @@ local function find_git_repos()
     return exec([[fd -H -d 2 -E "Library" -t d "^\.git$" "$HOME" | sed "s#/\.git/##g"]])
 end
 
----@return table
+---@return string All the directories
 _options.get_all_dirs = function()
-    all_dirs = {}
+    all = {}
 
-    for _, value in ipairs(_options.paths) do
-        for _, d in ipairs(M.list_dirs(value)) do
-            table.insert(all_dirs, d)
-        end
+    table.insert(all, _options.list_paths_dirs())
+    if _options.git_repos then
+        table.insert(all, find_git_repos())
     end
 
-    for _, d in ipairs(M.find_git_repos()) do
-        table.insert(all_dirs, d)
-    end
-
-    return all_dirs
+    return table.concat(all)
 end
 
-local function execute(cmd)
-    local handle = io.popen(cmd)
-    local output = handle:read("*a")
-    local success, exit_type, code = handle:close()
-
-    if success then
-        return output
-    end
-
-    return ""
-end
-
-M.select_workspace = function()
-    local dirs = M.get_all_dirs()
-    local selected = execute([[echo "]] ..
-        table.concat(dirs, "\n") ..
+_options.select_workspace = function()
+    local dirs = _options.get_all_dirs()
+    local selected = exec([[echo "]] .. dirs ..
         [[" | fzf --layout=reverse --preview-window down --preview "eza --color=always -l {}"]])
     return selected
 end
@@ -97,28 +79,58 @@ function trim(s)
 end
 
 ---@param config table
-M.change_workspace = function(config)
-    local selected = M.select_workspace()
+---@return string
+_options.change_workspace = function(config)
+    local selected = _options.select_workspace()
     if not selected or selected == "" then
-        return
+        return ""
     end
 
     selected = trim(selected)
     local basename = selected:match("([^/]+)$")
     local workspace = basename:gsub("%.", "_")
 
-    table.insert(config.keys, {
-        key = _options.binding.key,
-        mods = _options.binding.mods,
-        action = wezterm.action.SwitchToWorkspace {
-            name = workspace,
-        },
-    })
+    return workspace
+end
+
+local function get_plugin_dir()
+    for _, p in ipairs(wezterm.plugin.list()) do
+        if p.url:match("workspacesionizer") then
+            return p.plugin_dir
+        end
+    end
+    return wezterm.home_dir
+end
+
+local function split_lines(str)
+    local t = {}
+    for line in str:gmatch("([^\r\n]+)") do
+        table.insert(t, line)
+    end
+    return t
+end
+
+local function build_entries()
+    local entries = {}
+    local all = split_lines(_options.get_all_dirs())
+    local plugin_dir = get_plugin_dir()
+    local script = plugin_dir .. "plugin/workspace.sh"
+    for _, dir in ipairs(all) do
+        local full = expand_path(dir)
+        local name = full:match("([^/]+)$")
+        table.insert(entries, {
+            label = name,
+            args = { script },
+            cwd = full,
+            domain = "CurrentPaneDomain",
+            set_environment_variables = { WEZTERM_WORKSPACE = name },
+        })
+    end
+    return entries
 end
 
 ---@param config table
 ---@param options Sessionizer
----@return string output
 M.apply_to_config = function(config, options)
     if options.paths or options.paths ~= nil then
         _options.paths = {}
@@ -127,16 +139,27 @@ M.apply_to_config = function(config, options)
         end
     end
 
-    _options.git_repos = not (options.git_repos ~= nil and not _options.git_repos) and _options.git_repos
+    _options.git_repos = options.git_repos ~= false
 
-    local out = {}
-    if _options.git_repos then
-        table.insert(out, find_git_repos())
-    end
+    config.launch_menu = build_entries()
 
-    table.insert(out, _options.list_paths_dirs())
-    return table.concat(out, '')
+    table.insert(config.keys, {
+        key = _options.binding.key,
+        mods = _options.binding.mods,
+        action = wezterm.action.ShowLauncherArgs {
+            flags = "FUZZY|LAUNCH_MENU_ITEMS",
+        },
+    })
+
+    wezterm.on("user-var-changed", function(window, pane, name, base64_val)
+        if name == "workspace" and base64_val and base64_val ~= "" then
+            local decoded = wezterm.decode_base64(base64_val)
+            window:perform_action(
+                act.SwitchToWorkspace { name = decoded },
+                pane
+            )
+        end
+    end)
 end
-
 
 return M
