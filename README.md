@@ -2,7 +2,7 @@
 
 Like [tmux-sessionizer](https://github.com/ThePrimeagen/.dotfiles/blob/602019e902634188ab06ea31251c01c1a43d1621/bin/.local/scripts/tmux-sessionizer#L4), from [ThePrimeagen](https://github.com/ThePrimeagen), but for Wezterm workspaces.
 
-![video](/assets/demo.mp4)
+![video](/assets/demo.gif)
 
 > [!DANGER]
 > Custom binding not supported yet, give me a minute.
