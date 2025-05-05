@@ -5,6 +5,7 @@ local utils = require 'lua.workspacesionizer.utils'
 ---@alias W
 
 local W = {}
+
 ---@class W_options
 ---@field paths string[] The paths that contains the directories you want to switch into.
 ---@field git_repos boolean false if you don't want to include the git repositories from your HOME dir in the directories to switch into.
