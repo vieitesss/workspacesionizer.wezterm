@@ -15,15 +15,36 @@ local W = {}
 ---@field mods string The key to press.
 
 ---@type W_options
-local _options = {
-    paths = { wezterm.home_dir },
-    git_repos = true,
-    binding = {
-        key = "o",
-        mods = "LEADER",
-    },
-}
+local W_options = {}
 
+---@return W_options
+function W_options:new(o)
+    o = o or {}
+    setmetatable(o, self)
+    self.__index = self
+    return o
+end
+
+---@return string The first level of directories inside the paths.
+function W_options:list_paths_dirs()
+    return exec([[find -L ]] .. table.concat(self.path, ' ') .. [[ -type d -mindepth 1 -maxdepth 1 ]])
+end
+
+---@return string All the directories.
+function W_options:get_all_dirs()
+    ---@type table<string>
+    all = {}
+
+    table.insert(all, self:list_paths_dirs())
+    if self.git_repos then
+        table.insert(all, find_git_repos())
+    end
+
+    return table.concat(all)
+end
+
+---@param path string The path to expand if it starts with tilde.
+---@return string The path expanded, if needed.
 local function expand_path(path)
     if path:sub(1, 1) == "~" then
         local home = wezterm.home_dir
@@ -37,7 +58,7 @@ local function expand_path(path)
 end
 
 ---@param cmd string The command to execute.
----@return string The output
+---@return string The output of the command.
 local function exec(cmd)
     local handle = io.popen(cmd)
     local output = handle:read("*a")
@@ -50,24 +71,9 @@ local function exec(cmd)
     end
 end
 
-function W_options:list_paths_dirs(self)
-    return exec([[find -L ]] .. table.concat(self.path, ' ') .. [[ -type d -mindepth 1 -maxdepth 1 ]])
-end
-
+---@return string The git repos in the home directory separated by line.
 local function find_git_repos()
     return exec([[fd -H -d 2 -E "Library" -t d "^\.git$" "$HOME" | sed "s#/\.git/##g"]])
-end
-
----@return string All the directories
-function W_options:get_all_dirs(self)
-    all = {}
-
-    table.insert(all, self:list_paths_dirs())
-    if self.git_repos then
-        table.insert(all, find_git_repos())
-    end
-
-    return table.concat(all)
 end
 
 ---@param s string The string to trim.
@@ -116,6 +122,15 @@ local function build_entries()
     end
     return entries
 end
+
+local _options = W_options:new({
+    paths = { wezterm.home_dir },
+    git_repos = true,
+    binding = {
+        key = "o",
+        mods = "LEADER",
+    },
+})
 
 ---@param config table
 ---@param options W_options
