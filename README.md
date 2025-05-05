@@ -25,7 +25,7 @@ Second argument is the plugin configuration with the following specification:
 ```lua
 ---@class W_options
 ---@field paths string[] The paths that contains the directories you want to switch into.
----@field git_repos boolean false if you don't want to include the git repositories from your HOME dir in the directories to switch into.
+---@field git_repos boolean false if you do not want to include the git repositories from your HOME dir in the directories to switch into.
 ---@field show "base" | "full" Wether to show directories base or full name.
 ---@field binding W_options_binding
 
