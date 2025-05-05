@@ -1,17 +1,20 @@
 local wezterm = require("wezterm")
 
-local M = {}
+---@module Workspacesionizer
+---@alias W
 
----@class Sessionizer
----@field paths {string,...} The paths that contains the directories you want to switch into.
+local W = {}
+
+---@class W.options
+---@field paths table<string> The paths that contains the directories you want to switch into.
 ---@field git_repos boolean false if you don't want to include the git repositories from your HOME dir in the directories to switch into.
----@field binding Sessionizer.binding
+---@field binding W.options.binding
 
----@class Sessionizer.binding
+---@class W.options.binding
 ---@field key string The key to press.
 ---@field mods string The key to press.
 
----@type Sessionizer
+---@type W.options
 local _options = {
     paths = { wezterm.home_dir },
     git_repos = true,
@@ -47,8 +50,8 @@ local function exec(cmd)
     end
 end
 
-_options.list_paths_dirs = function()
-    return exec([[find -L ]] .. table.concat(_options.paths, ' ') .. [[ -type d -mindepth 1 -maxdepth 1 ]])
+function W.options:list_paths_dirs(self)
+    return exec([[find -L ]] .. table.concat(self.path, ' ') .. [[ -type d -mindepth 1 -maxdepth 1 ]])
 end
 
 local function find_git_repos()
@@ -56,11 +59,11 @@ local function find_git_repos()
 end
 
 ---@return string All the directories
-_options.get_all_dirs = function()
+function W.options:get_all_dirs(self)
     all = {}
 
-    table.insert(all, _options.list_paths_dirs())
-    if _options.git_repos then
+    table.insert(all, self:list_paths_dirs())
+    if self.git_repos then
         table.insert(all, find_git_repos())
     end
 
@@ -96,7 +99,7 @@ end
 ---@return table A table with entries of SpawnCommand.
 local function build_entries()
     local entries = {}
-    local all = split_lines(_options.get_all_dirs())
+    local all = split_lines(W.options:get_all_dirs())
     local plugin_dir = get_plugin_dir()
     local script = plugin_dir .. "/plugin/workspace.sh"
     for _, dir in ipairs(all) do
@@ -115,8 +118,8 @@ local function build_entries()
 end
 
 ---@param config table
----@param options Sessionizer
-M.apply_to_config = function(config, options)
+---@param options W.options
+W.apply_to_config = function(config, options)
     if options.paths or options.paths ~= nil then
         _options.paths = {}
         for _, p in ipairs(options.paths) do
@@ -153,4 +156,4 @@ M.apply_to_config = function(config, options)
     end)
 end
 
-return M
+return W
