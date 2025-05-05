@@ -98,6 +98,8 @@ W.apply_to_config = function(config, options)
         end
     end
 
+    _options.show = options.show or _options.show
+
     config.launch_menu = _options:build_entries()
 
     table.insert(config.keys, {
