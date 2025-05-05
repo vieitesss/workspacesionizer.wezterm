@@ -1,6 +1,19 @@
 local wezterm = require 'wezterm'
 local utils = require 'utils'
 
+function findPluginPackagePath(myProject)
+    local separator = package.config:sub(1, 1) == '\\' and '\\' or '/'
+    for _, v in ipairs(wezterm.plugin.list()) do
+        if v.url == myProject then
+            return v.plugin_dir .. separator .. 'plugin' .. separator .. '?.lua'
+        end
+    end
+end
+
+package.path = package.path
+    .. ';'
+    .. findPluginPackagePath 'file:///Users/vieites/personal/workspacesionizer.wezterm'
+
 ---@module Workspacesionizer
 ---@alias W
 
