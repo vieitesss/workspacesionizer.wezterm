@@ -27,7 +27,7 @@ end
 
 ---@return string The first level of directories inside the paths.
 function W_options:list_paths_dirs()
-    return exec([[find -L ]] .. table.concat(self.path, ' ') .. [[ -type d -mindepth 1 -maxdepth 1 ]])
+    return utils.exec([[find -L ]] .. table.concat(self.path, ' ') .. [[ -type d -mindepth 1 -maxdepth 1 ]])
 end
 
 ---@return string All the directories.
@@ -73,15 +73,6 @@ local _options = W_options:new({
     },
 })
 
-
-function W_options:echoo()
-    return self
-end
-
-function W_options:echo()
-    return self:echoo()
-end
-
 ---@param config table
 ---@param options W_options
 W.apply_to_config = function(config, options)
@@ -100,29 +91,27 @@ W.apply_to_config = function(config, options)
         end
     end
 
-    return _options:list_paths_dirs()
+    config.launch_menu = _options:build_entries()
 
-    -- config.launch_menu = _options:build_entries()
-    --
-    -- table.insert(config.keys, {
-    --     key = _options.binding.key,
-    --     mods = _options.binding.mods,
-    --     action = wezterm.action.ShowLauncherArgs {
-    --         flags = "FUZZY|LAUNCH_MENU_ITEMS",
-    --     },
-    -- })
-    --
-    -- wezterm.on("user-var-changed", function(window, pane, name, value)
-    --     wezterm.log_info(string.format("var changed: %s -> %s", name, value))
-    --     if name == "workspace" and value and value ~= "" then
-    --         window:perform_action(
-    --             wezterm.action.SwitchToWorkspace { name = value },
-    --             pane
-    --         )
-    --     end
-    -- end)
-    --
-    -- return config
+    table.insert(config.keys, {
+        key = _options.binding.key,
+        mods = _options.binding.mods,
+        action = wezterm.action.ShowLauncherArgs {
+            flags = "FUZZY|LAUNCH_MENU_ITEMS",
+        },
+    })
+
+    wezterm.on("user-var-changed", function(window, pane, name, value)
+        wezterm.log_info(string.format("var changed: %s -> %s", name, value))
+        if name == "workspace" and value and value ~= "" then
+            window:perform_action(
+                wezterm.action.SwitchToWorkspace { name = value },
+                pane
+            )
+        end
+    end)
+
+    return config
 end
 
 return W
