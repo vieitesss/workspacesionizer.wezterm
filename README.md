@@ -23,12 +23,13 @@ First argument is your own config, created with `wezterm.config_builder()`
 Second argument is the plugin configuration with the following specification:
 
 ```lua
----@class Sessionizer
----@field paths {string,...} The paths that contains the directories you want to switch into.
+---@class W_options
+---@field paths string[] The paths that contains the directories you want to switch into.
 ---@field git_repos boolean false if you don't want to include the git repositories from your HOME dir in the directories to switch into.
----@field binding Sessionizer.binding
+---@field show "base" | "full" Wether to show directories base or full name.
+---@field binding W_options_binding
 
----@class Sessionizer.binding
+---@class W_options_binding
 ---@field key string The key to press.
 ---@field mods string The key to press.
 ```
@@ -39,6 +40,7 @@ A full example:
 wpr.apply_to_config(config, {
     paths = { "~/personal", "~/.config", "~/dev" },
     git_repos = false,
+    show = "base",
     binding = {
         key = "p",
         mods = "CTRL",
@@ -52,6 +54,7 @@ wpr.apply_to_config(config, {
 {
     paths = { wezterm.home_dir },
     git_repos = true,
+    base = "full",
     binding = {
         key = "o",
         mods = "LEADER",
