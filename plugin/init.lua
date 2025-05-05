@@ -1,12 +1,12 @@
 local wezterm = require 'wezterm'
-local utils = require 'utils'
+local utils = require 'workspacesionizer.utils'
 
 ---@module Workspacesionizer
 ---@alias W
 
 local W = {}
 ---@class W_options
----@field paths table<string> The paths that contains the directories you want to switch into.
+---@field paths string[] The paths that contains the directories you want to switch into.
 ---@field git_repos boolean false if you don't want to include the git repositories from your HOME dir in the directories to switch into.
 ---@field binding W_options_binding
 
@@ -32,7 +32,7 @@ end
 
 ---@return string All the directories.
 function W_options:get_all_dirs()
-    ---@type table<string>
+    ---@type string[]
     all = {}
 
     table.insert(all, self:list_paths_dirs())
