@@ -55,7 +55,7 @@ function W_options:build_entries()
         local basename = full:match("([^/]+)$")
         local workspace = basename:gsub("%.", "_")
         table.insert(entries, {
-            label = basename,
+            label = full,
             args = { script },
             cwd = full,
             domain = "CurrentPaneDomain",
