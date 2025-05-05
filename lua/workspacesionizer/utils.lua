@@ -34,7 +34,7 @@ end
 M.find_git_repos = function()
     return M.exec([[find "$HOME" -maxdepth 2 \ 
 \( -path "$HOME/Library" -o -path "$HOME/.Trash" \) -prune \ 
--o -type d -name ".git" -print | sed "s#/\.git/##g"]])
+-o -type d -name ".git" -print | sed "s#/\.git##g"]])
 end
 
 ---@param s string The string to trim.
