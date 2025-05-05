@@ -27,7 +27,7 @@ end
 
 ---@return string The first level of directories inside the paths.
 function W_options:list_paths_dirs()
-    return utils.exec([[find -L ]] .. table.concat(self.path, ' ') .. [[ -type d -mindepth 1 -maxdepth 1 ]])
+    return utils.exec([[find -L ]] .. table.concat(self.paths, ' ') .. [[ -type d -mindepth 1 -maxdepth 1 ]])
 end
 
 ---@return string All the directories.
