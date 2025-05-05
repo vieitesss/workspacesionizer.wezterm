@@ -43,6 +43,27 @@ function W_options:get_all_dirs()
     return table.concat(all)
 end
 
+---@return table A table with entries of SpawnCommand.
+function W_options:build_entries()
+    local entries = {}
+    local all = split_lines(self:get_all_dirs())
+    local plugin_dir = get_plugin_dir()
+    local script = plugin_dir .. "/plugin/workspace.sh"
+    for _, dir in ipairs(all) do
+        local full = expand_path(dir)
+        local basename = full:match("([^/]+)$")
+        local workspace = basename:gsub("%.", "_")
+        table.insert(entries, {
+            label = basename,
+            args = { script },
+            cwd = full,
+            domain = "CurrentPaneDomain",
+            set_environment_variables = { WEZTERM_WORKSPACE = workspace },
+        })
+    end
+    return entries
+end
+
 ---@param path string The path to expand if it starts with tilde.
 ---@return string The path expanded, if needed.
 local function expand_path(path)
@@ -102,27 +123,6 @@ local function split_lines(s)
     return t
 end
 
----@return table A table with entries of SpawnCommand.
-local function build_entries()
-    local entries = {}
-    local all = split_lines(W_options:get_all_dirs())
-    local plugin_dir = get_plugin_dir()
-    local script = plugin_dir .. "/plugin/workspace.sh"
-    for _, dir in ipairs(all) do
-        local full = expand_path(dir)
-        local basename = full:match("([^/]+)$")
-        local workspace = basename:gsub("%.", "_")
-        table.insert(entries, {
-            label = basename,
-            args = { script },
-            cwd = full,
-            domain = "CurrentPaneDomain",
-            set_environment_variables = { WEZTERM_WORKSPACE = workspace },
-        })
-    end
-    return entries
-end
-
 local _options = W_options:new({
     paths = { wezterm.home_dir },
     git_repos = true,
@@ -150,7 +150,7 @@ W.apply_to_config = function(config, options)
         end
     end
 
-    config.launch_menu = build_entries()
+    config.launch_menu = _options:build_entries()
 
     table.insert(config.keys, {
         key = _options.binding.key,
