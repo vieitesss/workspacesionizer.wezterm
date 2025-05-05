@@ -1,5 +1,5 @@
 local wezterm = require 'wezterm'
-local utils = require 'lua.workspacesionizer.utils'
+local utils = require 'workspacesionizer.utils'
 
 ---@module Workspacesionizer
 ---@alias W
