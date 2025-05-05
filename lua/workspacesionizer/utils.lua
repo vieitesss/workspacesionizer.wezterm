@@ -32,8 +32,8 @@ end
 
 ---@return string The git repos in the home directory separated by line.
 M.find_git_repos = function()
-    return M.exec([[find "$HOME" -maxdepth 2 \ 
-\( -path "$HOME/Library" -o -path "$HOME/.Trash" \) -prune \ 
+    return M.exec([[find "$HOME" -maxdepth 2 \
+\( -path "$HOME/Library" -o -path "$HOME/.Trash" \) -prune \
 -o -type d -name ".git" -print | sed "s#/\.git##g"]])
 end
 
