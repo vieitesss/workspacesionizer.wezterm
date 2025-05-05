@@ -9,6 +9,7 @@ local W = {}
 ---@class W_options
 ---@field paths string[] The paths that contains the directories you want to switch into.
 ---@field git_repos boolean false if you don't want to include the git repositories from your HOME dir in the directories to switch into.
+---@field show "base" | "full" Wether showing directories base or full name.
 ---@field binding W_options_binding
 
 ---@class W_options_binding
@@ -54,8 +55,12 @@ function W_options:build_entries()
         local full = utils.expand_path(dir)
         local basename = full:match("([^/]+)$")
         local workspace = basename:gsub("%.", "_")
+        local label = full
+        if self.show == "base" then
+            label = workspace
+        end
         table.insert(entries, {
-            label = full,
+            label = label,
             args = { script },
             cwd = full,
             domain = "CurrentPaneDomain",
@@ -68,6 +73,7 @@ end
 local _options = W_options:new({
     paths = { wezterm.home_dir },
     git_repos = true,
+    show = "full",
     binding = {
         key = "o",
         mods = "LEADER",
