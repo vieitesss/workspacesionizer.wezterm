@@ -100,7 +100,7 @@ W.apply_to_config = function(config, options)
         end
     end
 
-    return _options:echo()
+    return _options:list_paths_dirs()
 
     -- config.launch_menu = _options:build_entries()
     --
