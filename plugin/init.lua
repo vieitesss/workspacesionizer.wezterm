@@ -73,8 +73,13 @@ local _options = W_options:new({
     },
 })
 
-function W_options:echo()
+
+function W_options:echoo()
     return self
+end
+
+function W_options:echo()
+    return self:echoo()
 end
 
 ---@param config table
@@ -116,6 +121,8 @@ W.apply_to_config = function(config, options)
     --         )
     --     end
     -- end)
+    --
+    -- return config
 end
 
 return W
