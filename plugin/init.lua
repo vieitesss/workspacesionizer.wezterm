@@ -1,18 +1,32 @@
 local wezterm = require 'wezterm'
-local utils = require 'utils'
 
-function findPluginPackagePath(myProject)
-    local separator = package.config:sub(1, 1) == '\\' and '\\' or '/'
-    for _, v in ipairs(wezterm.plugin.list()) do
-        if v.url == myProject then
-            return v.plugin_dir .. separator .. 'plugin' .. separator .. '?.lua'
-        end
-    end
+local separator = package.config:sub(1, 1) == "\\" and "\\" or "/"
+local plugin_dir = wezterm.plugin.list()[1].plugin_dir:gsub(separator .. "[^" .. separator .. "]*$", "")
+
+--- Checks if the plugin directory exists
+local function directory_exists(path)
+    local success, result = pcall(wezterm.read_dir, plugin_dir .. path)
+    return success and result
+end
+
+--- Returns the name of the package, used when requiring modules
+local function get_require_path()
+    local path = "httpssCssZssZsgithubsDscomsZsvieitessssZsworkspacesionizersDswezterm"
+    local path_trailing_slash = "httpssCssZssZsgithubsDscomsZsvieitessssZsworkspacesionizersDsweztermZs"
+    return directory_exists(path_trailing_slash) and path_trailing_slash or path
 end
 
 package.path = package.path
-    .. ';'
-    .. findPluginPackagePath 'file:///Users/vieites/personal/workspacesionizer.wezterm'
+    .. ";"
+    .. plugin_dir
+    .. separator
+    .. get_require_path()
+    .. separator
+    .. "plugin"
+    .. separator
+    .. "?.lua"
+
+local utils = require 'utils'
 
 ---@module Workspacesionizer
 ---@alias W
