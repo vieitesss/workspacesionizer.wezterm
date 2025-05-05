@@ -1,5 +1,5 @@
 local wezterm = require 'wezterm'
-local utils = require 'workspacesionizer.utils'
+local utils = require 'utils'
 
 ---@module Workspacesionizer
 ---@alias W
