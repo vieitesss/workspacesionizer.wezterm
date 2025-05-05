@@ -1,5 +1,5 @@
 local wezterm = require 'wezterm'
-local utils = require 'plugin.utils'
+local utils = require 'utils'
 
 ---@module Workspacesionizer
 ---@alias W
@@ -90,6 +90,8 @@ W.apply_to_config = function(config, options)
             _options.binding = options.binding
         end
     end
+
+    return _options
 
     config.launch_menu = _options:build_entries()
 
