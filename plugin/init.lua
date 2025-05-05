@@ -93,25 +93,25 @@ W.apply_to_config = function(config, options)
 
     return _options
 
-    config.launch_menu = _options:build_entries()
-
-    table.insert(config.keys, {
-        key = _options.binding.key,
-        mods = _options.binding.mods,
-        action = wezterm.action.ShowLauncherArgs {
-            flags = "FUZZY|LAUNCH_MENU_ITEMS",
-        },
-    })
-
-    wezterm.on("user-var-changed", function(window, pane, name, value)
-        wezterm.log_info(string.format("var changed: %s -> %s", name, value))
-        if name == "workspace" and value and value ~= "" then
-            window:perform_action(
-                wezterm.action.SwitchToWorkspace { name = value },
-                pane
-            )
-        end
-    end)
+    -- config.launch_menu = _options:build_entries()
+    --
+    -- table.insert(config.keys, {
+    --     key = _options.binding.key,
+    --     mods = _options.binding.mods,
+    --     action = wezterm.action.ShowLauncherArgs {
+    --         flags = "FUZZY|LAUNCH_MENU_ITEMS",
+    --     },
+    -- })
+    --
+    -- wezterm.on("user-var-changed", function(window, pane, name, value)
+    --     wezterm.log_info(string.format("var changed: %s -> %s", name, value))
+    --     if name == "workspace" and value and value ~= "" then
+    --         window:perform_action(
+    --             wezterm.action.SwitchToWorkspace { name = value },
+    --             pane
+    --         )
+    --     end
+    -- end)
 end
 
 return W
