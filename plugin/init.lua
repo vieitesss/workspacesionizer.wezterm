@@ -1,10 +1,10 @@
-local wezterm = require("wezterm")
+local wezterm = require 'wezterm'
+local utils = require 'utils'
 
 ---@module Workspacesionizer
 ---@alias W
 
 local W = {}
-
 ---@class W_options
 ---@field paths table<string> The paths that contains the directories you want to switch into.
 ---@field git_repos boolean false if you don't want to include the git repositories from your HOME dir in the directories to switch into.
@@ -37,7 +37,7 @@ function W_options:get_all_dirs()
 
     table.insert(all, self:list_paths_dirs())
     if self.git_repos then
-        table.insert(all, find_git_repos())
+        table.insert(all, utils.find_git_repos())
     end
 
     return table.concat(all)
@@ -46,11 +46,11 @@ end
 ---@return table A table with entries of SpawnCommand.
 function W_options:build_entries()
     local entries = {}
-    local all = split_lines(self:get_all_dirs())
-    local plugin_dir = get_plugin_dir()
+    local all = utils.split_lines(self:get_all_dirs())
+    local plugin_dir = utils.get_plugin_dir()
     local script = plugin_dir .. "/plugin/workspace.sh"
     for _, dir in ipairs(all) do
-        local full = expand_path(dir)
+        local full = utils.expand_path(dir)
         local basename = full:match("([^/]+)$")
         local workspace = basename:gsub("%.", "_")
         table.insert(entries, {
@@ -62,65 +62,6 @@ function W_options:build_entries()
         })
     end
     return entries
-end
-
----@param path string The path to expand if it starts with tilde.
----@return string The path expanded, if needed.
-local function expand_path(path)
-    if path:sub(1, 1) == "~" then
-        local home = wezterm.home_dir
-        if path == "~" then
-            return home
-        elseif path:sub(2, 3) == "/ " or path:sub(2, 2) == "/" then
-            return home .. path:sub(2)
-        end
-    end
-    return path
-end
-
----@param cmd string The command to execute.
----@return string The output of the command.
-local function exec(cmd)
-    local handle = io.popen(cmd)
-    local output = handle:read("*a")
-    local success, exit_type, code = handle:close()
-
-    if success then
-        return output
-    else
-        return string.format("The command failed (%s, code %d)\n", exit_type, code)
-    end
-end
-
----@return string The git repos in the home directory separated by line.
-local function find_git_repos()
-    return exec([[fd -H -d 2 -E "Library" -t d "^\.git$" "$HOME" | sed "s#/\.git/##g"]])
-end
-
----@param s string The string to trim.
----@return string The string trimed.
-local function trim(s)
-    return (s:gsub("^%s*(.-)%s*$", "%1"))
-end
-
----@return string The absolute path to de plugin.
-local function get_plugin_dir()
-    for _, p in ipairs(wezterm.plugin.list()) do
-        if p.url:match("workspacesionizer") then
-            return p.plugin_dir:gsub("/+$", "")
-        end
-    end
-    return wezterm.home_dir
-end
-
----@param s string The string to split into lines.
----@return table A table with all the lines from the string.
-local function split_lines(s)
-    local t = {}
-    for line in s:gmatch("([^\r\n]+)") do
-        table.insert(t, line)
-    end
-    return t
 end
 
 local _options = W_options:new({
@@ -138,7 +79,7 @@ W.apply_to_config = function(config, options)
     if options.paths or options.paths ~= nil then
         _options.paths = {}
         for _, p in ipairs(options.paths) do
-            table.insert(_options.paths, expand_path(p))
+            table.insert(_options.paths, utils.expand_path(p))
         end
     end
 
