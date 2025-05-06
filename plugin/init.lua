@@ -101,20 +101,19 @@ function W_options:build_entries()
     local entries = {}
     local dirs = utils.split_lines(self:get_all_dirs())
 
-    -- for _, d in ipairs(dirs) do
-    --
-    --     local label = d
-    --     if self.show == "base" then
-    --         label = d:match("([^/]+)$")
-    --     end
-    --
-    --     table.insert(entries, {
-    --         id = d,
-    --         label = label,
-    --     })
-    -- end
+    for _, d in ipairs(dirs) do
+        local label = d
+        if self.show == "base" then
+            label = d:match("([^/]+)$")
+        end
 
-    return dirs
+        table.insert(entries, {
+            id = d,
+            label = label,
+        })
+    end
+
+    return entries
 end
 
 local _options = W_options:new({
