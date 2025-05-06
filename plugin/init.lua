@@ -102,15 +102,13 @@ function W_options:build_entries()
     local dirs = utils.split_lines(self:get_all_dirs())
 
     for _, d in ipairs(dirs) do
-        local basename = d:match("([^/]+)$")
-        local workspace = basename:gsub("[%.%-]", "_")
         local label = d
         if self.show == "base" then
-            label = basename
+            label = d:match("([^/]+)$")
         end
 
         table.insert(entries, {
-            id = workspace,
+            id = d,
             label = label,
         })
     end
@@ -161,8 +159,15 @@ W.apply_to_config = function(config, options)
                             wezterm.log_info 'cancelled'
                         else
                             wezterm.log_info('you selected ', id, label)
+                            local basename = id:match("([^/]+)$")
+                            local workspace = basename:gsub("[%.%-]", "_")
                             window:perform_action(
-                                wezterm.action.SwitchToWorkspace { name = id },
+                                wezterm.action.SwitchToWorkspace {
+                                    name = workspace,
+                                    spawn = {
+                                        cwd = id,
+                                    }
+                                },
                                 pane
                             )
                         end
