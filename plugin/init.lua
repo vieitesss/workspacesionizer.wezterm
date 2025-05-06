@@ -72,30 +72,30 @@ function W_options:get_all_dirs()
     return table.concat(all)
 end
 
----@return table A table with entries of SpawnCommand.
-function W_options:build_entries()
-    local entries = {}
-    local all = utils.split_lines(self:get_all_dirs())
-    local plugin_dir = utils.get_plugin_dir()
-    local script = plugin_dir .. "/plugin/workspace.sh"
-    for _, dir in ipairs(all) do
-        local full = utils.expand_path(dir)
-        local basename = full:match("([^/]+)$")
-        local workspace = basename:gsub("[%.%-]", "_")
-        local label = full
-        if self.show == "base" then
-            label = workspace
-        end
-        table.insert(entries, {
-            label = label,
-            args = { script },
-            cwd = full,
-            domain = "CurrentPaneDomain",
-            set_environment_variables = { WEZTERM_WORKSPACE = workspace },
-        })
-    end
-    return entries
-end
+-- ---@return table A table with entries of SpawnCommand.
+-- function W_options:build_entries()
+--     local entries = {}
+--     local all = utils.split_lines(self:get_all_dirs())
+--     local plugin_dir = utils.get_plugin_dir()
+--     local script = plugin_dir .. "/plugin/workspace.sh"
+--     for _, dir in ipairs(all) do
+--         local full = utils.expand_path(dir)
+--         local basename = full:match("([^/]+)$")
+--         local workspace = basename:gsub("[%.%-]", "_")
+--         local label = full
+--         if self.show == "base" then
+--             label = workspace
+--         end
+--         table.insert(entries, {
+--             label = label,
+--             args = { script },
+--             cwd = full,
+--             domain = "CurrentPaneDomain",
+--             set_environment_variables = { WEZTERM_WORKSPACE = workspace },
+--         })
+--     end
+--     return entries
+-- end
 
 local _options = W_options:new({
     paths = { wezterm.home_dir },
@@ -127,28 +127,34 @@ W.apply_to_config = function(config, options)
 
     _options.show = options.show or _options.show
 
-    config.launch_menu = _options:build_entries()
-
     table.insert(config.keys, {
         key = _options.binding.key,
         mods = _options.binding.mods,
-        action = wezterm.action.Multiple {
-            wezterm.action.ReloadConfiguration,
-            wezterm.action.ShowLauncherArgs {
-                flags = "FUZZY|LAUNCH_MENU_ITEMS",
-            },
-        },
-    })
+        action = wezterm.action_callback(function(window, pane)
+            local choices = utils.split_lines(_options:gel_all_dirs())
 
-    wezterm.on("user-var-changed", function(window, pane, name, value)
-        wezterm.log_info(string.format("var changed: %s -> %s", name, value))
-        if name == "workspace" and value and value ~= "" then
             window:perform_action(
-                wezterm.action.SwitchToWorkspace { name = value },
+                act.InputSelector {
+                    action = wezterm.action_callback(function(window, pane, id, label)
+                        if not id and not label then
+                            wezterm.log_info 'cancelled'
+                        else
+                            wezterm.log_info('you selected ', id, label)
+                            window:perform_action(
+                                wezterm.action.SwitchToWorkspace { name = value },
+                                pane
+                            )
+                        end
+                    end),
+                    title = 'Select a workspace',
+                    choices = choices,
+                    alphabet = '123456789',
+                    description = 'Write the index number you want to choose or press / to search.',
+                },
                 pane
             )
-        end
-    end)
+        end),
+    })
 
     return config
 end
