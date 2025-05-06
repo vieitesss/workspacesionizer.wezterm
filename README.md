@@ -1,5 +1,7 @@
 # Workspacesionizer.wezterm
 
+Blazingly fast workspace chooser for WezTerm.
+
 Like [tmux-sessionizer](https://github.com/ThePrimeagen/.dotfiles/blob/602019e902634188ab06ea31251c01c1a43d1621/bin/.local/scripts/tmux-sessionizer#L4), from [ThePrimeagen](https://github.com/ThePrimeagen), but for Wezterm workspaces.
 
 ![demo](/assets/demo.gif)
@@ -52,7 +54,7 @@ wpr.apply_to_config(config, {
 
 ```lua
 {
-    paths = { wezterm.home_dir },
+    paths = { "~" },
     git_repos = true,
     base = "full",
     binding = {
