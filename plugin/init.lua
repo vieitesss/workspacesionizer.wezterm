@@ -72,31 +72,6 @@ function W_options:get_all_dirs()
     return table.concat(all)
 end
 
--- ---@return table A table with entries of SpawnCommand.
--- function W_options:build_entries()
---     local entries = {}
---     local all = utils.split_lines(self:get_all_dirs())
---     local plugin_dir = utils.get_plugin_dir()
---     local script = plugin_dir .. "/plugin/workspace.sh"
---     for _, dir in ipairs(all) do
---         local full = utils.expand_path(dir)
---         local basename = full:match("([^/]+)$")
---         local workspace = basename:gsub("[%.%-]", "_")
---         local label = full
---         if self.show == "base" then
---             label = workspace
---         end
---         table.insert(entries, {
---             label = label,
---             args = { script },
---             cwd = full,
---             domain = "CurrentPaneDomain",
---             set_environment_variables = { WEZTERM_WORKSPACE = workspace },
---         })
---     end
---     return entries
--- end
-
 function W_options:build_entries()
     local entries = {}
     local dirs = utils.split_lines(self:get_all_dirs())
