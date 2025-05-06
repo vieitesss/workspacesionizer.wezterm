@@ -131,7 +131,8 @@ W.apply_to_config = function(config, options)
         key = _options.binding.key,
         mods = _options.binding.mods,
         action = wezterm.action_callback(function(win, pane)
-            config.launch_menu = _options:build_entries()
+            local entries = _options:build_entries()
+            win:set_config_overrides { launch_menu = entries }
             return wezterm.action.ShowLauncherArgs {
                 flags = "FUZZY|LAUNCH_MENU_ITEMS",
             }
