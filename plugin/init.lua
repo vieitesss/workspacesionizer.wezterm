@@ -114,6 +114,7 @@ function W_options:build_entries()
         })
     end
 
+    return dirs
 end
 
 local _options = W_options:new({
