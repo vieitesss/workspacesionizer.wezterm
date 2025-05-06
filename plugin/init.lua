@@ -167,10 +167,10 @@ W.apply_to_config = function(config, options)
                             )
                         end
                     end),
-                    title = 'Select a workspace',
+                    title = 'Workspacesionizer',
                     choices = choices,
                     fuzzy = true,
-                    fuzzy_description = 'Fuzzy find and/or make a workspace',
+                    fuzzy_description = 'Fuzzy find and/or make a workspace: ',
                 },
                 pane
             )
