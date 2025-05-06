@@ -153,7 +153,7 @@ W.apply_to_config = function(config, options)
             local choices = _options:build_entries()
 
             window:perform_action(
-                act.InputSelector {
+                wezterm.action.InputSelector {
                     action = wezterm.action_callback(function(window, pane, id, label)
                         if not id and not label then
                             wezterm.log_info 'cancelled'
