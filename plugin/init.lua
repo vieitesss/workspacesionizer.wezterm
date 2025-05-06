@@ -130,8 +130,7 @@ W.apply_to_config = function(config, options)
     table.insert(config.keys, {
         key = _options.binding.key,
         mods = _options.binding.mods,
-        action = wezterm.action
-        Multiple {
+        action = wezterm.action.Multiple {
             wezterm.action.ReloadConfiguration,
             wezterm.action.ShowLauncherArgs {
                 flags = "FUZZY|LAUNCH_MENU_ITEMS",
