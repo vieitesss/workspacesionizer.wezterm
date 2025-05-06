@@ -102,13 +102,15 @@ function W_options:build_entries()
     local dirs = utils.split_lines(self:get_all_dirs())
 
     for _, d in ipairs(dirs) do
+        local basename = d:match("([^/]+)$")
+        local workspace = basename:gsub("[%.%-]", "_")
         local label = d
         if self.show == "base" then
-            label = d:match("([^/]+)$")
+            label = basename
         end
 
         table.insert(entries, {
-            id = d,
+            id = workspace,
             label = label,
         })
     end
@@ -160,7 +162,7 @@ W.apply_to_config = function(config, options)
                         else
                             wezterm.log_info('you selected ', id, label)
                             window:perform_action(
-                                wezterm.action.SwitchToWorkspace { name = value },
+                                wezterm.action.SwitchToWorkspace { name = label },
                                 pane
                             )
                         end
