@@ -162,7 +162,7 @@ W.apply_to_config = function(config, options)
                         else
                             wezterm.log_info('you selected ', id, label)
                             window:perform_action(
-                                wezterm.action.SwitchToWorkspace { name = label },
+                                wezterm.action.SwitchToWorkspace { name = id },
                                 pane
                             )
                         end
