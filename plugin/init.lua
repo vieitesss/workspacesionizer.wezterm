@@ -97,6 +97,25 @@ end
 --     return entries
 -- end
 
+function W_options:build_entries()
+    local entries = {}
+    local dirs = utils.split_lines(self:get_all_dirs())
+
+    for _, d in ipairs(dirs) do
+
+        local label = d
+        if self.show == "base" then
+            label = d:match("([^/]+)$")
+        end
+
+        table.insert(entries, {
+            id = d,
+            label = label,
+        })
+    end
+
+end
+
 local _options = W_options:new({
     paths = { wezterm.home_dir },
     git_repos = true,
@@ -131,7 +150,7 @@ W.apply_to_config = function(config, options)
         key = _options.binding.key,
         mods = _options.binding.mods,
         action = wezterm.action_callback(function(window, pane)
-            local choices = utils.split_lines(_options:gel_all_dirs())
+            local choices = _options:build_entries()
 
             window:perform_action(
                 act.InputSelector {
@@ -148,8 +167,8 @@ W.apply_to_config = function(config, options)
                     end),
                     title = 'Select a workspace',
                     choices = choices,
-                    alphabet = '123456789',
-                    description = 'Write the index number you want to choose or press / to search.',
+                    fuzzy = true,
+                    fuzzy_description = 'Fuzzy find and/or make a workspace',
                 },
                 pane
             )
