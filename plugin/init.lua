@@ -130,12 +130,12 @@ W.apply_to_config = function(config, options)
     table.insert(config.keys, {
         key = _options.binding.key,
         mods = _options.binding.mods,
-        action = wezterm.action_callback(
+        action = wezterm.action_callback(function(win, pane)
             config.launch_menu = _options:build_entries()
             return wezterm.action.ShowLauncherArgs {
                 flags = "FUZZY|LAUNCH_MENU_ITEMS",
             }
-        ),
+        end),
     })
 
     wezterm.on("user-var-changed", function(window, pane, name, value)
