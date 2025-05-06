@@ -127,6 +127,8 @@ W.apply_to_config = function(config, options)
 
     _options.show = options.show or _options.show
 
+    config.launch_meno = _options:build_entries()
+
     table.insert(config.keys, {
         key = _options.binding.key,
         mods = _options.binding.mods,
