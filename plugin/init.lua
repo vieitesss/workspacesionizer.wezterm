@@ -81,7 +81,7 @@ function W_options:build_entries()
     for _, dir in ipairs(all) do
         local full = utils.expand_path(dir)
         local basename = full:match("([^/]+)$")
-        local workspace = basename:gsub("%.", "_")
+        local workspace = basename:gsub("[%.%-]", "_")
         local label = full
         if self.show == "base" then
             label = workspace
@@ -127,14 +127,15 @@ W.apply_to_config = function(config, options)
 
     _options.show = options.show or _options.show
 
-    config.launch_menu = _options:build_entries()
-
     table.insert(config.keys, {
         key = _options.binding.key,
         mods = _options.binding.mods,
-        action = wezterm.action.ShowLauncherArgs {
-            flags = "FUZZY|LAUNCH_MENU_ITEMS",
-        },
+        action = wezterm.action_callback(
+            config.launch_menu = _options:build_entries()
+            return wezterm.action.ShowLauncherArgs {
+                flags = "FUZZY|LAUNCH_MENU_ITEMS",
+            }
+        ),
     })
 
     wezterm.on("user-var-changed", function(window, pane, name, value)
