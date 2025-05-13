@@ -33,7 +33,7 @@ Second argument is the plugin configuration with the following specification:
 
 ---@class W_options_binding
 ---@field key string The key to press.
----@field mods string The key to press.
+---@field mods string The modifiers to use.
 ```
 
 A full example:
