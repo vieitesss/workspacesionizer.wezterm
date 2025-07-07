@@ -56,7 +56,7 @@ wpr.apply_to_config(config, {
 {
     paths = { "~" },
     git_repos = true,
-    base = "full",
+    show = "full",
     binding = {
         key = "o",
         mods = "LEADER",
