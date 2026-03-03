@@ -66,4 +66,4 @@ wpr.apply_to_config(config, {
 
 ## Autocompletion
 
-Check out github.com/DrKJeff16/wezterm-types
+Check out https://github.com/DrKJeff16/wezterm-types
